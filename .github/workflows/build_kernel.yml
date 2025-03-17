@@ -60,26 +60,26 @@ jobs:
       - name: Download kernel code
         run: |
           curl -fsSL https://git.kernel.org/torvalds/t/linux-6.14-rc7.tar.gz -o kernel.tar.gz
-          tar xvpf kernel.tar.gz
+          mkdir kernel && tar xvpf kernel.tar.gz -C kernel
 
       # 配置编译选项并下载依赖
       - name: Configure the kernel
         run: |
-          cp kernel.config linux-6.14-rc6/.config
-          cd linux-6.14-rc6 && 
+          cp kernel.config kernel/linux-*/.config
+          cd kernel/linux-* && 
           # make menuconfig &&
           make prepare
       
       # 编译内核
       - name: Build the kernel
         run: |
-          cd linux-6.14-rc6 && 
+          cd kernel/linux-* && 
           make -j$(nproc)
       
       # 添加 git repository
       - name: Add git repository
         run: |
-          cd linux-6.14-rc6 &&
+          cd kernel/linux-* && 
           git init &&
           git config --global --add safe.directory $(pwd) &&
           git config --global user.email "you@example.com" &&
@@ -90,7 +90,7 @@ jobs:
       # 生成 deb 包
       - name: Create deb package
         run: |
-          cd linux-6.14-rc6 && 
+          cd kernel/linux-* && 
           make deb-pkg &&
           cd .. &&
           mkdir build &&
